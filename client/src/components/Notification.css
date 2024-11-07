@@ -6,13 +6,15 @@
   transform: translateX(-50%);
   background-color: #305f64;
   color: #fff;
-  padding: 12px 24px;
-  border-radius: 5px;
+  padding: 1px 5px; /* Slightly increased padding for a better rectangular shape */
+  border-radius: 8px; /* Makes the corners less rounded */
   font-size: 16px;
   font-weight: bold;
   z-index: 1000;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   animation: fadeInOut 3s ease-in-out;
+  width: 250px;
+  height: 50px;
 }
 
 @keyframes fadeInOut {
