@@ -10,6 +10,7 @@ const Cart = () => {
     useAuth0();
   const [cartItems, setCartItems] = useState([]);
   const navigate = useNavigate();
+  const [isDeleted, setIsDeleted] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -33,6 +34,8 @@ const Cart = () => {
           },
         });
 
+        console.log(response);
+
         if (!response.ok) throw new Error("Failed to fetch cart items");
 
         const data = await response.json();
@@ -43,7 +46,7 @@ const Cart = () => {
     };
 
     fetchCartItems();
-  }, [isAuthenticated, getAccessTokenSilently, navigate]);
+  }, [isAuthenticated, getAccessTokenSilently, navigate, isDeleted]);
 
   function handleUpdateAmount(productId, amount) {
     console.log("handleUpdateAmount", productId, amount);
@@ -82,6 +85,7 @@ const Cart = () => {
                 item={item}
                 productId={item.productId._id}
                 onUpdateAmount={handleUpdateAmount}
+                setIsDeleted={setIsDeleted}
               />
             ))
           ) : (
