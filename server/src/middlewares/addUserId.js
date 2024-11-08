@@ -15,7 +15,6 @@ export async function addUserId(req, _, next) {
   if (req.auth) {
     req.userId = req.auth.payload.sub;
   } else {
-    console.warn("No auth object found on request object. Cannot add userId.");
     req.userId = undefined;
   }
   next();

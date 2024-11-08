@@ -18,6 +18,11 @@ function Products() {
   });
   const [availableColors, setAvailableColors] = useState([]);
   const [availableMaterials, setAvailableMaterials] = useState([]);
+  const [shouldReload, setShouldReload] = useState(true);
+
+  // useEffect(() => {
+  //   setShouldReload(true);
+  // }, [productId]);
 
   useEffect(() => {
     async function fetchProducts() {
@@ -57,7 +62,7 @@ function Products() {
     }
 
     fetchProducts();
-  }, [isAuthenticated, getAccessTokenSilently, filters]);
+  }, [isAuthenticated, getAccessTokenSilently, filters, shouldReload]);
 
   useEffect(() => {
     async function fetchColors() {
@@ -128,7 +133,7 @@ function Products() {
       <div className="products-container">
         {products.map((product) => (
           <div key={product._id}>
-            <ProductCard product={product} />
+            <ProductCard product={product} onItemAdded={setShouldReload} />
           </div>
         ))}
       </div>

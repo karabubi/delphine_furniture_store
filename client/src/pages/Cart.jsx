@@ -34,6 +34,8 @@ const Cart = () => {
           },
         });
 
+        console.log(response);
+
         if (!response.ok) throw new Error("Failed to fetch cart items");
 
         const data = await response.json();
