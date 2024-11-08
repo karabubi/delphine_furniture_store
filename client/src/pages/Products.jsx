@@ -64,7 +64,7 @@ function Products() {
   useEffect(() => {
     async function fetchColors() {
       try {
-        const response = await fetch("http://localhost:3000/products/colors");
+        const response = await fetch(`${API_URL}/products/colors`);
         const colors = await response.json();
         setAvailableColors(colors);
       } catch (error) {
@@ -74,9 +74,7 @@ function Products() {
 
     async function fetchMaterials() {
       try {
-        const response = await fetch(
-          "http://localhost:3000/products/materials"
-        );
+        const response = await fetch(`${API_URL}/products/materials`);
         const materials = await response.json();
         setAvailableMaterials(materials);
       } catch (error) {

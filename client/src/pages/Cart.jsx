@@ -12,6 +12,8 @@ const Cart = () => {
   const navigate = useNavigate();
   const [isDeleted, setIsDeleted] = useState(false);
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     if (!isAuthenticated) {
       const searchParams = new URLSearchParams();
@@ -28,7 +30,7 @@ const Cart = () => {
     const fetchCartItems = async () => {
       try {
         const accessToken = await getAccessTokenSilently();
-        const response = await fetch("http://localhost:3000/cart", {
+        const response = await fetch(`${API_URL}/cart`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },

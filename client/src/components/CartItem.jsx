@@ -12,13 +12,15 @@ const CartItem = ({
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
   const { changeCartCount } = useOutletContext();
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   async function editCart(newAmount) {
     let accessToken = "";
     if (isAuthenticated) {
       accessToken = await getAccessTokenSilently();
     }
     try {
-      const response = await fetch("http://localhost:3000/cart/edit", {
+      const response = await fetch(`${API_URL}/cart/edit`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -49,7 +51,7 @@ const CartItem = ({
       accessToken = await getAccessTokenSilently();
     }
     try {
-      const response = await fetch("http://localhost:3000/cart/delete", {
+      const response = await fetch(`${API_URL}/cart/delete`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
