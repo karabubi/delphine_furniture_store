@@ -1,4 +1,4 @@
-import "./FilterBar.css";
+import "./Filterbar.css";
 const FilterBar = ({
   filters,
   onFilterChange = [],
