@@ -2,10 +2,15 @@ import "./CartItem.css";
 import { useOutletContext } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 
-const CartItem = ({ item, productId, onUpdateAmount }) => {
+const CartItem = ({
+  item,
+  productId,
+  onUpdateAmount,
+
+  setIsDeleted,
+}) => {
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
   const { changeCartCount } = useOutletContext();
-
 
   async function editCart(newAmount) {
     let accessToken = "";
@@ -37,6 +42,33 @@ const CartItem = ({ item, productId, onUpdateAmount }) => {
       console.error("Error adding product to cart:", error);
     }
   }
+  const handleDelete = async (productId) => {
+    let accessToken = "";
+    console.log("test");
+    if (isAuthenticated) {
+      accessToken = await getAccessTokenSilently();
+    }
+    try {
+      const response = await fetch("http://localhost:3000/cart/delete", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: accessToken ? `Bearer ${accessToken}` : undefined,
+        },
+        body: JSON.stringify({
+          _id: productId,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error("Data fetching error");
+      }
+      setIsDeleted(false);
+      changeCartCount(data.cartCount);
+    } catch (error) {
+      console.error("Error adding product to cart:", error);
+    }
+  };
 
   return (
     <div className="cart-item">
@@ -49,7 +81,7 @@ const CartItem = ({ item, productId, onUpdateAmount }) => {
             <h3>{item.productId.name}</h3>
             {/* <p className="price-section">Price: ${item.productId.price}</p> */}
             <div className="total">
-              <p>Total: ${item.amount * item.productId.price.toFixed(2)}</p>
+              <p>Total: ${(item.amount * item.productId.price).toFixed(2)}</p>
             </div>{" "}
             <div className="quantity">
               <button onClick={() => editCart(item.amount - 1)}>-</button>
@@ -57,7 +89,15 @@ const CartItem = ({ item, productId, onUpdateAmount }) => {
               <button onClick={() => editCart(item.amount + 1)}>+</button>
             </div>{" "}
           </div>
-          <button className="delete">DELETE</button>
+          <button
+            className="delete"
+            onClick={() => {
+              handleDelete(item.productId._id);
+              setIsDeleted(true);
+            }}
+          >
+            DELETE
+          </button>{" "}
         </div>
       </div>
     </div>

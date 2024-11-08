@@ -7,17 +7,40 @@ function ProductDetails() {
   const { productId } = useParams();
   const [product, setProduct] = useState(null);
   const [count, setCount] = useState(1);
+  const [shouldReload, setShouldReload] = useState(true);
+
   useEffect(() => {
-    fetch(`http://localhost:3000/products/${productId}`)
-      .then((res) => res.json())
-      .then((data) => setProduct(data))
-      .catch(console.error);
+    setShouldReload(true);
   }, [productId]);
+
+  useEffect(() => {
+    if (shouldReload) {
+      fetch(`http://localhost:3000/products/${productId}`)
+        .then((res) => res.json())
+        .then((data) => setProduct(data))
+        .catch(console.error)
+        .finally(() => {
+          setShouldReload(false);
+        });
+    }
+  }, [productId, shouldReload]);
 
   if (!product) {
     return <div>Loading...</div>;
   }
-
+  function countDecrement() {
+    if (count > 1) {
+      setCount(count - 1);
+    }
+  }
+  function countIncrement() {
+    if (count < 20) {
+      setCount(count + 1);
+    }
+  }
+  function handleItemAdded() {
+    setShouldReload(true);
+  }
   return (
     <div className="product-details">
       <div className="product-details-image">
@@ -32,13 +55,14 @@ function ProductDetails() {
         <p className="info">Color: {product.color}</p>
         <p className="info">Available: {product.available}</p>
         <div className="buttons">
-          <button onClick={() => setCount(count - 1)}>-</button>
+          <button onClick={() => countDecrement()}>-</button>
           <p>{count}</p>
-          <button onClick={() => setCount(count + 1)}>+</button>
+          <button onClick={() => countIncrement()}>+</button>
           <AddToCartButton
             productId={product._id}
             amount={count}
             buttonText="Add to Cart"
+            onItemAdded={handleItemAdded}
           />
         </div>
       </div>

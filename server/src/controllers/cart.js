@@ -111,9 +111,11 @@ export const addToCart = async (req, res) => {
 export const editCart = async (req, res) => {
   try {
     const userId = req.userId;
+
     console.log(userId);
     await db.connect();
     const { _id, amount } = req.body;
+    console.log("productIndex3", _id);
 
     if (!_id || !amount) {
       return res.status(400).json({ message: "Missing required fields" });
@@ -154,5 +156,46 @@ export const editCart = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(400).json({ message: "Internal server error" });
+  }
+};
+
+export const deleteCart = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { _id } = req.body;
+    console.log("productIndex", _id);
+
+    if (!userId || !_id) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+    await db.connect();
+    const cart = await Cart.findOne({ userId });
+
+    const productIndex = cart.products.findIndex(
+      (product) => product.productId.toString() === _id
+    );
+    if (productIndex === -1) {
+      return res.status(404).json({ error: "Product not found in cart" });
+    }
+    // if (cart.products[productIndex].amount > 1) {
+    //   cart.products[productIndex].amount -= 1;
+    //   console.log("Updated amount:", productIndex.amount);
+    // } else {
+    cart.products.splice(productIndex, 1);
+    // }
+    await cart.save();
+    const product = await Product.findById(_id);
+    if (product) {
+      product.available += cart.products[productIndex].amount;
+      await product.save();
+    }
+    console.log("cart", cart);
+    const cartCount = cart.products.reduce((acc, cur) => acc + cur.amount, 0);
+    console.log("cartCount", cartCount);
+
+    res.json({ cartCount });
+  } catch (error) {
+    console.error(error);
+    res.json({ message: "Internal server error" });
   }
 };

@@ -29,7 +29,7 @@ function Products() {
         if (isAuthenticated) {
           accessToken = await getAccessTokenSilently();
         }
-        console.log(filters);
+        // console.log(filters);
         // Filter-Parameter in der URL erzeugen
         const query = new URLSearchParams(filters).toString(); // Dies erstellt die Filter-Query
         const url = query

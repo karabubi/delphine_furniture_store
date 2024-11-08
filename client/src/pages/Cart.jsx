@@ -8,6 +8,7 @@ const Cart = () => {
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
   const [cartItems, setCartItems] = useState([]);
   const navigate = useNavigate();
+  const [isDeleted, setIsDeleted] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -34,7 +35,7 @@ const Cart = () => {
     };
 
     fetchCartItems();
-  }, [isAuthenticated, getAccessTokenSilently, navigate]);
+  }, [isAuthenticated, getAccessTokenSilently, navigate, isDeleted]);
 
   function handleUpdateAmount(productId, amount) {
     console.log("handleUpdateAmount", productId, amount);
@@ -69,6 +70,7 @@ const Cart = () => {
                 item={item}
                 productId={item.productId._id}
                 onUpdateAmount={handleUpdateAmount}
+                setIsDeleted={setIsDeleted}
               />
             ))
           ) : (

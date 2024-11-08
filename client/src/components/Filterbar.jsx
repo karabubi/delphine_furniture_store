@@ -7,7 +7,7 @@ const FilterBar = ({
   availableMaterials,
 }) => {
   const handleCategoryChange = (e) => {
-    console.log("Selected Filters:", filters);
+    // console.log("Selected Filters:", filters);
     onFilterChange({ ...filters, category: e.target.value });
   };
 
@@ -28,7 +28,7 @@ const FilterBar = ({
     onFilterChange({ ...filters, material: e.target.value });
   };
 
-  console.log("Colors:  ", availableColors);
+  // console.log("Colors:  ", availableColors);
 
   return (
     <div className="filter-bar">

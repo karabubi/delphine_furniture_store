@@ -1,9 +1,14 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { useOutletContext, Link } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 import { addToCart } from "../util/addToCart.js";
 import { useLocation } from "react-router-dom";
 
-function AddToCartButton({ productId, amount = 1, buttonText = "+" }) {
+function AddToCartButton({
+  productId,
+  amount = 1,
+  buttonText = "+",
+  onItemAdded,
+}) {
   const { pathname } = useLocation();
   const { getAccessTokenSilently, isAuthenticated, loginWithRedirect } =
     useAuth0();
@@ -11,6 +16,7 @@ function AddToCartButton({ productId, amount = 1, buttonText = "+" }) {
 
   const handleAddToCart = async () => {
     let accessToken = "";
+
     if (isAuthenticated) {
       accessToken = await getAccessTokenSilently();
     } else {
@@ -32,11 +38,18 @@ function AddToCartButton({ productId, amount = 1, buttonText = "+" }) {
       amount,
       accessToken,
     });
+    onItemAdded();
     changeCartCount(cartCount);
   };
   return (
     <>
-      <button onClick={handleAddToCart}>{buttonText}</button>
+      <button
+        onClick={() => {
+          handleAddToCart();
+        }}
+      >
+        {buttonText}
+      </button>
     </>
   );
 }
