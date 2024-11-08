@@ -39,7 +39,6 @@ function App() {
   }
 
   function showNotification(message) {
-    console.log(message);
     setNotificationMessage(message);
   }
 

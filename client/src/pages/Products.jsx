@@ -50,7 +50,6 @@ function Products() {
 
         if (Array.isArray(data) && data.length > 0) {
           setProducts(data);
-          showNotification(""); // Reset notification if products are found
         } else {
           setProducts([]);
           showNotification("No products found for the selected filter.");

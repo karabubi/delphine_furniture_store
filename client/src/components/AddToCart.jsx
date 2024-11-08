@@ -6,7 +6,7 @@ function AddToCartButton({
   productId,
   amount = 1,
   buttonText = "+",
-  onItemAdded,
+  onItemAdded = () => {},
 }) {
   const { showNotification } = useOutletContext();
   const { pathname } = useLocation();
