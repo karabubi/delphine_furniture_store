@@ -1,17 +1,14 @@
 import { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import ProductCard from "../components/ProductCard.jsx";
+import FilterBar from "../components/FilterBar.jsx";
+import { useOutletContext } from "react-router-dom";
 import "./Products.css";
 
-import { useNavigate } from "react-router-dom";
-
-import FilterBar from "../components/Filterbar.jsx";
-
 function Products() {
+  const { showNotification } = useOutletContext();
   const [products, setProducts] = useState([]);
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
-  const navigate = useNavigate();
-
   const [filters, setFilters] = useState({
     category: "",
     color: "",
@@ -29,12 +26,10 @@ function Products() {
         if (isAuthenticated) {
           accessToken = await getAccessTokenSilently();
         }
-        console.log(filters);
-        // Filter-Parameter in der URL erzeugen
-        const query = new URLSearchParams(filters).toString(); // Dies erstellt die Filter-Query
+        const query = new URLSearchParams(filters).toString();
         const url = query
           ? `http://localhost:3000/products?${query}`
-          : `http://localhost:3000/products`; // Wenn keine Filter vorhanden, nur /products
+          : `http://localhost:3000/products`;
 
         const response = await fetch(url, {
           headers: {
@@ -42,25 +37,29 @@ function Products() {
           },
         });
 
-        // Überprüfen, ob die Antwort erfolgreich ist
         if (!response.ok) {
           throw new Error("Failed to fetch products: " + response.statusText);
         }
 
         const data = await response.json();
 
-        // Überprüfen, ob die Antwort ein Array ist
-        if (Array.isArray(data)) {
+        if (Array.isArray(data) && data.length > 0) {
           setProducts(data);
+          showNotification(""); // Reset notification if products are found
         } else {
-          console.error("Expected an array but got:", data);
-          setProducts([]); // Leere Liste setzen, wenn die Antwort nicht wie erwartet ist
+          setProducts([]);
+          showNotification("No products found for the selected filter.");
         }
       } catch (error) {
         console.error("Error fetching products:", error);
+        showNotification("Failed to fetch products. Please try again later.");
       }
     }
 
+    fetchProducts();
+  }, [isAuthenticated, getAccessTokenSilently, filters]);
+
+  useEffect(() => {
     async function fetchColors() {
       try {
         const response = await fetch("http://localhost:3000/products/colors");
@@ -75,18 +74,17 @@ function Products() {
       try {
         const response = await fetch(
           "http://localhost:3000/products/materials"
-        ); // API für Materialien
+        );
         const materials = await response.json();
-        setAvailableMaterials(materials); // Setze die verfügbaren Materialien
+        setAvailableMaterials(materials);
       } catch (error) {
         console.error("Error fetching materials:", error);
       }
     }
 
-    fetchMaterials();
-    fetchProducts();
     fetchColors();
-  }, [isAuthenticated, getAccessTokenSilently, filters]); // Füge filters als Abhängigkeit hinzu
+    fetchMaterials();
+  }, []);
 
   const getHeadingText = () => {
     if (
@@ -127,7 +125,6 @@ function Products() {
         availableMaterials={availableMaterials}
       />
       <h1 className="dynamic-h1-filter">{getHeadingText()}</h1>
-      {/* <Notification show={true} message={"You need to login"}></Notification> */}
       <div className="products-container">
         {products.map((product) => (
           <div key={product._id}>
