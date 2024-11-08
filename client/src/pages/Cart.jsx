@@ -1,17 +1,26 @@
 import { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import CartItem from "../components/CartItem.jsx";
 import "./Cart.css";
 
 const Cart = () => {
-  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+  const { pathname } = useLocation();
+  const { isAuthenticated, getAccessTokenSilently, loginWithRedirect } =
+    useAuth0();
   const [cartItems, setCartItems] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate("/login", { state: { returnTo: "/cart" } });
+      const searchParams = new URLSearchParams();
+      searchParams.append("redirect", pathname);
+      loginWithRedirect({
+        authorizationParams: {
+          redirect_uri:
+            window.location.origin + "/login?" + searchParams.toString(),
+        },
+      });
       return;
     }
 
@@ -57,6 +66,10 @@ const Cart = () => {
     (acc, cur) => acc + cur.amount * cur.productId.price,
     0
   );
+
+  if (!isAuthenticated) {
+    return null;
+  }
   return (
     <>
       <div className="cart">
