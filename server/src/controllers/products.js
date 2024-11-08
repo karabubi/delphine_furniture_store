@@ -47,22 +47,31 @@ export const bestSellingProducts = async (req, res) => {
         }
       });
     });
-
-    // 4. sort products based on sales as arrays
-    const sortedProducts = Object.entries(productCounts)
-      .sort((a, b) => b[1] - a[1]) // array besteht aus productId und amount, compare amount hier
-      .slice(0, 4); // wollen nur ersten 4
-
-    // 5. call product drtails for top 4 products
-    const bestSellingProductIds = sortedProducts.map(([productId]) =>
-      Product.findById(productId)
+    // console.log(Object.keys(productCounts).length);
+    if (Object.keys(productCounts).length <= 3) {
+      const products = await Product.find()
         .select("name price categoryId image")
         .populate("categoryId", "name")
-    );
+        .limit(4);
+      console.log("test", products);
+      res.json(products);
+    } else {
+      // 4. sort products based on sales as arrays
+      const sortedProducts = Object.entries(productCounts)
+        .sort((a, b) => b[1] - a[1]) // array besteht aus productId und amount, compare amount hier
+        .slice(0, 4); // wollen nur ersten 4
 
-    const bestSellingProducts = await Promise.all(bestSellingProductIds);
+      // 5. call product drtails for top 4 products
+      const bestSellingProductIds = sortedProducts.map(([productId]) =>
+        Product.findById(productId)
+          .select("name price categoryId image")
+          .populate("categoryId", "name")
+      );
 
-    res.json(bestSellingProducts);
+      const bestSellingProducts = await Promise.all(bestSellingProductIds);
+
+      res.json(bestSellingProducts);
+    }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
