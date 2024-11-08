@@ -1,28 +1,75 @@
 import Product from "../models/Product.js";
 import { db } from "../util/db-connect.js";
 import Category from "../models/Category.js";
+import Cart from "../models/Cart.js";
 
 // Best Selling Product
 /**
  * @api GET /products/bestSelling
  *
  */
-export const bestSellingProducts = async (req, res) => {
-  try {
-    await db.connect();
-    const products = await Product.find()
-      .select("name price categoryId image")
-      .populate("categoryId", "name")
-      .limit(4);
-    res.json(products);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+// export const bestSellingProducts = async (req, res) => {
+//   try {
+//     await db.connect();
+//     const products = await Product.find()
+//       .select("name price categoryId image")
+//       .populate("categoryId", "name")
+//       .limit(4);
+//     res.json(products);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
 /**
  * @api GET products/productId
  *
  */
+
+export const bestSellingProducts = async (req, res) => {
+  try {
+    // 0. connect to db
+    await db.connect();
+
+    // 1. get all carts
+    const carts = await Cart.find();
+
+    // 2.  declare productCount
+    const productCounts = {};
+
+    // 3.  gets alls the products in the carts for each cart
+    carts.forEach((cart) => {
+      cart.products.forEach((item) => {
+        const productId = item.productId.toString();
+        if (productCounts[productId]) {
+          productCounts[productId] += item.amount; // wenn produkt bereits existiert add amount
+        } else {
+          productCounts[productId] = item.amount; // sonst set amount
+        }
+      });
+    });
+
+    // 4. sort products based on sales as arrays
+    const sortedProducts = Object.entries(productCounts)
+      .sort((a, b) => b[1] - a[1]) // array besteht aus productId und amount, compare amount hier
+      .slice(0, 4); // wollen nur ersten 4
+
+    // 5. call product drtails for top 4 products
+    const bestSellingProductIds = sortedProducts.map(([productId]) =>
+      Product.findById(productId)
+        .select("name price categoryId image")
+        .populate("categoryId", "name")
+    );
+
+    const bestSellingProducts = await Promise.all(bestSellingProductIds);
+
+    res.json(bestSellingProducts);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// product details
+
 export const productDetails = async (req, res) => {
   const { productId } = req.params;
   try {

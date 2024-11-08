@@ -1,7 +1,6 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useLocation } from "react-router-dom";
 import { addToCart } from "../util/addToCart.js";
-import { useLocation } from "react-router-dom";
 
 function AddToCartButton({
   productId,
@@ -9,6 +8,7 @@ function AddToCartButton({
   buttonText = "+",
   onItemAdded,
 }) {
+  const { showNotification } = useOutletContext();
   const { pathname } = useLocation();
   const { getAccessTokenSilently, isAuthenticated, loginWithRedirect } =
     useAuth0();
@@ -20,9 +20,7 @@ function AddToCartButton({
     if (isAuthenticated) {
       accessToken = await getAccessTokenSilently();
     } else {
-      alert(
-        "Bitte loggen Sie sich ein, um Produkte in den Warenkorb zu legen."
-      );
+      alert("Please log in to add items to the cart.");
       const searchParams = new URLSearchParams();
       searchParams.append("redirect", pathname);
       loginWithRedirect({
@@ -33,14 +31,22 @@ function AddToCartButton({
       });
       return;
     }
-    const cartCount = await addToCart({
-      productId,
-      amount,
-      accessToken,
-    });
-    onItemAdded();
-    changeCartCount(cartCount);
+
+    try {
+      const cartCount = await addToCart({
+        productId,
+        amount,
+        accessToken,
+      });
+      onItemAdded();
+      changeCartCount(cartCount);
+      showNotification("Item added to cart!");
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      showNotification("Failed to add item to cart.");
+    }
   };
+
   return (
     <>
       <button

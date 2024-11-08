@@ -3,9 +3,11 @@ import "./App.css";
 import Navbar from "./components/Navbar.jsx";
 import { useState, useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
+import Notification from "./components/Notification.jsx";
 
 function App() {
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+  const [notificationMessage, setNotificationMessage] = useState("");
   const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
@@ -36,13 +38,24 @@ function App() {
     setCartCount(newCartCount);
   }
 
+  function showNotification(message) {
+    console.log(message);
+    setNotificationMessage(message);
+  }
+
   return (
     <>
       <Navbar cartCount={cartCount} />
       <Outlet
         context={{
           changeCartCount,
+          showNotification,
         }}
+      />
+      <Notification
+        show={!!notificationMessage}
+        message={notificationMessage}
+        onHide={() => setNotificationMessage("")}
       />
     </>
   );
