@@ -1,18 +1,15 @@
-import { useEffect, useState } from 'react';
-import './Notification.css';
+import { useEffect } from "react";
+import "./Notification.css";
 
-function Notification({ message, show }) {
-  const [isVisible, setIsVisible] = useState(show);
-
+function Notification({ message, show, onHide }) {
   useEffect(() => {
-    setIsVisible(show);
     if (show) {
-      const timer = setTimeout(() => setIsVisible(false), 3000); // Hide after 3 seconds
+      const timer = setTimeout(() => onHide(), 3000); // Hide after 3 seconds
       return () => clearTimeout(timer); // Cleanup timer
     }
-  }, [show]);
+  }, [show, onHide]);
 
-  if (!isVisible) return null;
+  if (!show) return null;
 
   return (
     <div className="notification">

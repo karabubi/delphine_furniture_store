@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import ProductCard from "../components/ProductCard.jsx";
 import FilterBar from "../components/FilterBar.jsx";
-import Notification from "../components/Notification";
+import { useOutletContext } from "react-router-dom";
 import "./Products.css";
 
 function Products() {
+  const { showNotification } = useOutletContext();
   const [products, setProducts] = useState([]);
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
   const [filters, setFilters] = useState({
@@ -13,11 +14,10 @@ function Products() {
     color: "",
     material: "",
     minPrice: "",
-    maxPrice: ""
+    maxPrice: "",
   });
   const [availableColors, setAvailableColors] = useState([]);
   const [availableMaterials, setAvailableMaterials] = useState([]);
-  const [notification, setNotification] = useState("");
 
   useEffect(() => {
     async function fetchProducts() {
@@ -33,8 +33,8 @@ function Products() {
 
         const response = await fetch(url, {
           headers: {
-            Authorization: accessToken ? `Bearer ${accessToken}` : undefined
-          }
+            Authorization: accessToken ? `Bearer ${accessToken}` : undefined,
+          },
         });
 
         if (!response.ok) {
@@ -45,14 +45,14 @@ function Products() {
 
         if (Array.isArray(data) && data.length > 0) {
           setProducts(data);
-          setNotification(""); // Reset notification if products are found
+          showNotification(""); // Reset notification if products are found
         } else {
           setProducts([]);
-          setNotification("No products found for the selected filter.");
+          showNotification("No products found for the selected filter.");
         }
       } catch (error) {
         console.error("Error fetching products:", error);
-        setNotification("Failed to fetch products. Please try again later.");
+        showNotification("Failed to fetch products. Please try again later.");
       }
     }
 
@@ -118,7 +118,6 @@ function Products() {
 
   return (
     <div>
-      <Notification message={notification} show={!!notification} />
       <FilterBar
         filters={filters}
         onFilterChange={setFilters}
