@@ -20,9 +20,7 @@ function Products() {
   const [availableMaterials, setAvailableMaterials] = useState([]);
   const [shouldReload, setShouldReload] = useState(true);
 
-  // useEffect(() => {
-  //   setShouldReload(true);
-  // }, [productId]);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     async function fetchProducts() {
@@ -33,8 +31,8 @@ function Products() {
         }
         const query = new URLSearchParams(filters).toString();
         const url = query
-          ? `http://localhost:3000/products?${query}`
-          : `http://localhost:3000/products`;
+          ? `${API_URL}/products?${query}`
+          : `${API_URL}/products`;
 
         const response = await fetch(url, {
           headers: {

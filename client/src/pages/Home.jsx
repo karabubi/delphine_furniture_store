@@ -9,6 +9,8 @@ function Home() {
   const [products, setProducts] = useState([]);
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     async function fetchBestSelling() {
       try {
@@ -16,14 +18,11 @@ function Home() {
         if (isAuthenticated) {
           accessToken = await getAccessTokenSilently();
         }
-        const response = await fetch(
-          "http://localhost:3000/products/bestSelling",
-          {
-            headers: {
-              Authorization: accessToken ? `Bearer ${accessToken}` : undefined,
-            },
-          }
-        );
+        const response = await fetch(`${API_URL}/products/bestSelling`, {
+          headers: {
+            Authorization: accessToken ? `Bearer ${accessToken}` : undefined,
+          },
+        });
 
         const data = await response.json();
         setProducts(data);

@@ -9,13 +9,15 @@ function ProductDetails() {
   const [count, setCount] = useState(1);
   const [shouldReload, setShouldReload] = useState(true);
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     setShouldReload(true);
   }, [productId]);
 
   useEffect(() => {
     if (shouldReload) {
-      fetch(`http://localhost:3000/products/${productId}`)
+      fetch(`${API_URL}/products/${productId}`)
         .then((res) => res.json())
         .then((data) => setProduct(data))
         .catch(console.error)

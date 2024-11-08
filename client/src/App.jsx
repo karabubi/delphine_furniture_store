@@ -10,11 +10,13 @@ function App() {
   const [notificationMessage, setNotificationMessage] = useState("");
   const [cartCount, setCartCount] = useState(0);
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     const fetchCartCount = async () => {
       try {
         const token = await getAccessTokenSilently();
-        const response = await fetch("http://localhost:3000/cart/count", {
+        const response = await fetch(`${API_URL}/cart/count`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
